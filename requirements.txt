@@ -1,0 +1,8 @@
+requests
+pandas
+numpy
+datetime
+nba_api
+streamlit
+streamlit_sortables
+pyodbc
