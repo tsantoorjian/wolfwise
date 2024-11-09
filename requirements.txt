@@ -6,3 +6,4 @@ nba_api
 streamlit
 streamlit_sortables
 pyodbc
+tenacity

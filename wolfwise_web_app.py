@@ -11,11 +11,17 @@ from datetime import datetime
 from nba_api.stats.static import teams
 from nba_api.stats.endpoints import leaguegamefinder
 from streamlit_sortables import sort_items
+from tenacity import retry, wait_fixed, stop_after_attempt
+from requests.exceptions import ReadTimeout
 
 # Get game logs from the regular season
-gamefinder = leaguegamefinder.LeagueGameFinder(season_nullable='2024-25',
+@retry(wait=wait_fixed(2), stop=stop_after_attempt(5), retry=ReadTimeout)
+def get_gamefinder():
+    return leaguegamefinder.LeagueGameFinder(season_nullable='2024-25',
                                                league_id_nullable='00',
                                                season_type_nullable='Regular Season')
+
+gamefinder = get_gamefinder()
 games = gamefinder.get_data_frames()[0]
 
 # Filter for TEAM_ABBREVIATION == 'MIN' and get the game IDs
@@ -126,9 +132,6 @@ except pyodbc.Error as e:
 
 
 ######################### step 2 build graphical user interface #########################
-# Path to your SQLite database
-db_path = '/Users/tonysantoorjian/Documents/ww_db.db'
-
 # Path to your images folder
 image_folder = 'images'
 
