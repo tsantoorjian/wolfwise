@@ -12,6 +12,7 @@ from datetime import datetime
 def get_latest_game_id():
     url = 'https://data.nba.com/data/10s/v2015/json/mobile_teams/nba/2024/league/00_full_schedule.json'
     response = requests.get(url)
+
     if response.status_code == 200:
         schedule_data = response.json()
         games = schedule_data.get('lscd', [])
@@ -38,12 +39,21 @@ def get_latest_game_id():
         # Sort games by date in descending order to get the most recent game
         timberwolves_games.sort(key=lambda x: datetime.strptime(x['date'], '%Y-%m-%d'), reverse=True)
 
-        if timberwolves_games:
-            return timberwolves_games[0]['game_id']
-        else:
-            print("No games found for the Timberwolves.")
+        # Get the current date
+        current_date = datetime.now()
+
+        # Iterate through the sorted games and find the latest game on or before the current date
+        for game in timberwolves_games:
+            game_date = datetime.strptime(game['date'], '%Y-%m-%d')
+            # Only consider games on or before the current date
+            if game_date <= current_date:
+                return game['game_id']
+
+        # If no past games are found, print a message
+        print("No past games found for the Timberwolves.")
     else:
         print("Failed to retrieve the schedule data.")
+
     return None
 
 
