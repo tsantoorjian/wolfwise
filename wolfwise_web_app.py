@@ -11,17 +11,11 @@ from datetime import datetime
 from nba_api.stats.static import teams
 from nba_api.stats.endpoints import leaguegamefinder
 from streamlit_sortables import sort_items
-from tenacity import retry, wait_fixed, stop_after_attempt
-from requests.exceptions import ReadTimeout
 
 # Get game logs from the regular season
-@retry(wait=wait_fixed(2), stop=stop_after_attempt(5), retry=ReadTimeout)
-def get_gamefinder():
-    return leaguegamefinder.LeagueGameFinder(season_nullable='2024-25',
+gamefinder = leaguegamefinder.LeagueGameFinder(season_nullable='2024-25',
                                                league_id_nullable='00',
                                                season_type_nullable='Regular Season')
-
-gamefinder = get_gamefinder()
 games = gamefinder.get_data_frames()[0]
 
 # Filter for TEAM_ABBREVIATION == 'MIN' and get the game IDs
